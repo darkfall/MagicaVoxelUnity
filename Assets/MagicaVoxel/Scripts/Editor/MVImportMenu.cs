@@ -17,7 +17,21 @@ public class MVImportMenu {
 
 			MVMainChunk mc = MVImporter.LoadVOX (path);
 
-			Debug.Log (mc);
+			Mesh m = MVImporter.CreateMeshFromChunk (mc.voxelChunk, mc.palatte);
+
+			if (m != null) {
+				GameObject go = new GameObject ();
+				MeshFilter mf = go.AddComponent<MeshFilter> ();
+				mf.mesh = m;
+
+				MeshRenderer mr = go.AddComponent<MeshRenderer> ();
+
+				go.AddComponent<BoxCollider> ();
+
+				Material mat = new Material (Shader.Find ("MagicaVoxel/FlatColor"));
+				mr.material = mat;
+			}
+
 		}
 	}
 

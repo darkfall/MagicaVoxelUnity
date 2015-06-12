@@ -1,14 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
-
-public struct MVColor
-{
-	public byte r;
-	public byte g;
-	public byte b;
-	public byte a;
-}
+using System.Collections.Generic;
 
 public struct MVFaceCollection
 {
@@ -31,289 +24,282 @@ public class MVVoxelChunk
 
 public enum MVFaceDir
 {
-	XPlus = 0,
-	XNeg  = 1,
-	YPlus = 2,
-	YNeg  = 3,
-	ZPlus = 4,
-	ZNeg  = 5
+	XPos = 0,
+	XNeg = 1,
+	YPos = 2,
+	YNeg = 3,
+	ZPos = 4,
+	ZNeg = 5
 }
-		
-public class MVVoxelQuadBuffer
-{
-	Vector3[] vertices;
-	Vector2[] uvs;
-	Color[] colors;
-}
-
+	
 public class MVMainChunk
 {
 	public MVVoxelChunk voxelChunk;
 
-	public MVColor[] palatte;
+	public Color[] palatte;
 
 	public int sizeX, sizeY, sizeZ;
 
 	public byte[] version;
 
 #region default_palatte
-	public static MVColor[] defaultPalatte = new MVColor[] {
-		new MVColor { r = 0xff, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xff, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xff, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xcc, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x99, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x99, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x66, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x66, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x33, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x33, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xff, b = 0xff, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xcc, b = 0xcc, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x99, b = 0x99, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x66, b = 0x66, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x33, b = 0x33, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xee, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xdd, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xbb, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xaa, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x88, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x77, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x55, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x44, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x22, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x11, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xee, b = 0xee, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xdd, b = 0xdd, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xbb, b = 0xbb, a = 0xFF },
-		new MVColor { r = 0x00, g = 0xaa, b = 0xaa, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x88, b = 0x88, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x77, b = 0x77, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x55, b = 0x55, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x44, b = 0x44, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x22, b = 0x22, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x11, b = 0x11, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF },
-		new MVColor { r = 0xee, g = 0xee, b = 0xee, a = 0xFF },
-		new MVColor { r = 0xdd, g = 0xdd, b = 0xdd, a = 0xFF },
-		new MVColor { r = 0xbb, g = 0xbb, b = 0xbb, a = 0xFF },
-		new MVColor { r = 0xaa, g = 0xaa, b = 0xaa, a = 0xFF },
-		new MVColor { r = 0x88, g = 0x88, b = 0x88, a = 0xFF },
-		new MVColor { r = 0x77, g = 0x77, b = 0x77, a = 0xFF },
-		new MVColor { r = 0x55, g = 0x55, b = 0x55, a = 0xFF },
-		new MVColor { r = 0x44, g = 0x44, b = 0x44, a = 0xFF },
-		new MVColor { r = 0x22, g = 0x22, b = 0x22, a = 0xFF },
-		new MVColor { r = 0x11, g = 0x11, b = 0x11, a = 0xFF },
-		new MVColor { r = 0x00, g = 0x00, b = 0x00, a = 0xFF }
+	public static Color[] defaultPalatte = new Color[] {
+		new Color(1.000000f, 1.000000f, 1.000000f),
+		new Color(1.000000f, 1.000000f, 0.800000f),
+		new Color(1.000000f, 1.000000f, 0.600000f),
+		new Color(1.000000f, 1.000000f, 0.400000f),
+		new Color(1.000000f, 1.000000f, 0.200000f),
+		new Color(1.000000f, 1.000000f, 0.000000f),
+		new Color(1.000000f, 0.800000f, 1.000000f),
+		new Color(1.000000f, 0.800000f, 0.800000f),
+		new Color(1.000000f, 0.800000f, 0.600000f),
+		new Color(1.000000f, 0.800000f, 0.400000f),
+		new Color(1.000000f, 0.800000f, 0.200000f),
+		new Color(1.000000f, 0.800000f, 0.000000f),
+		new Color(1.000000f, 0.600000f, 1.000000f),
+		new Color(1.000000f, 0.600000f, 0.800000f),
+		new Color(1.000000f, 0.600000f, 0.600000f),
+		new Color(1.000000f, 0.600000f, 0.400000f),
+		new Color(1.000000f, 0.600000f, 0.200000f),
+		new Color(1.000000f, 0.600000f, 0.000000f),
+		new Color(1.000000f, 0.400000f, 1.000000f),
+		new Color(1.000000f, 0.400000f, 0.800000f),
+		new Color(1.000000f, 0.400000f, 0.600000f),
+		new Color(1.000000f, 0.400000f, 0.400000f),
+		new Color(1.000000f, 0.400000f, 0.200000f),
+		new Color(1.000000f, 0.400000f, 0.000000f),
+		new Color(1.000000f, 0.200000f, 1.000000f),
+		new Color(1.000000f, 0.200000f, 0.800000f),
+		new Color(1.000000f, 0.200000f, 0.600000f),
+		new Color(1.000000f, 0.200000f, 0.400000f),
+		new Color(1.000000f, 0.200000f, 0.200000f),
+		new Color(1.000000f, 0.200000f, 0.000000f),
+		new Color(1.000000f, 0.000000f, 1.000000f),
+		new Color(1.000000f, 0.000000f, 0.800000f),
+		new Color(1.000000f, 0.000000f, 0.600000f),
+		new Color(1.000000f, 0.000000f, 0.400000f),
+		new Color(1.000000f, 0.000000f, 0.200000f),
+		new Color(1.000000f, 0.000000f, 0.000000f),
+		new Color(0.800000f, 1.000000f, 1.000000f),
+		new Color(0.800000f, 1.000000f, 0.800000f),
+		new Color(0.800000f, 1.000000f, 0.600000f),
+		new Color(0.800000f, 1.000000f, 0.400000f),
+		new Color(0.800000f, 1.000000f, 0.200000f),
+		new Color(0.800000f, 1.000000f, 0.000000f),
+		new Color(0.800000f, 0.800000f, 1.000000f),
+		new Color(0.800000f, 0.800000f, 0.800000f),
+		new Color(0.800000f, 0.800000f, 0.600000f),
+		new Color(0.800000f, 0.800000f, 0.400000f),
+		new Color(0.800000f, 0.800000f, 0.200000f),
+		new Color(0.800000f, 0.800000f, 0.000000f),
+		new Color(0.800000f, 0.600000f, 1.000000f),
+		new Color(0.800000f, 0.600000f, 0.800000f),
+		new Color(0.800000f, 0.600000f, 0.600000f),
+		new Color(0.800000f, 0.600000f, 0.400000f),
+		new Color(0.800000f, 0.600000f, 0.200000f),
+		new Color(0.800000f, 0.600000f, 0.000000f),
+		new Color(0.800000f, 0.400000f, 1.000000f),
+		new Color(0.800000f, 0.400000f, 0.800000f),
+		new Color(0.800000f, 0.400000f, 0.600000f),
+		new Color(0.800000f, 0.400000f, 0.400000f),
+		new Color(0.800000f, 0.400000f, 0.200000f),
+		new Color(0.800000f, 0.400000f, 0.000000f),
+		new Color(0.800000f, 0.200000f, 1.000000f),
+		new Color(0.800000f, 0.200000f, 0.800000f),
+		new Color(0.800000f, 0.200000f, 0.600000f),
+		new Color(0.800000f, 0.200000f, 0.400000f),
+		new Color(0.800000f, 0.200000f, 0.200000f),
+		new Color(0.800000f, 0.200000f, 0.000000f),
+		new Color(0.800000f, 0.000000f, 1.000000f),
+		new Color(0.800000f, 0.000000f, 0.800000f),
+		new Color(0.800000f, 0.000000f, 0.600000f),
+		new Color(0.800000f, 0.000000f, 0.400000f),
+		new Color(0.800000f, 0.000000f, 0.200000f),
+		new Color(0.800000f, 0.000000f, 0.000000f),
+		new Color(0.600000f, 1.000000f, 1.000000f),
+		new Color(0.600000f, 1.000000f, 0.800000f),
+		new Color(0.600000f, 1.000000f, 0.600000f),
+		new Color(0.600000f, 1.000000f, 0.400000f),
+		new Color(0.600000f, 1.000000f, 0.200000f),
+		new Color(0.600000f, 1.000000f, 0.000000f),
+		new Color(0.600000f, 0.800000f, 1.000000f),
+		new Color(0.600000f, 0.800000f, 0.800000f),
+		new Color(0.600000f, 0.800000f, 0.600000f),
+		new Color(0.600000f, 0.800000f, 0.400000f),
+		new Color(0.600000f, 0.800000f, 0.200000f),
+		new Color(0.600000f, 0.800000f, 0.000000f),
+		new Color(0.600000f, 0.600000f, 1.000000f),
+		new Color(0.600000f, 0.600000f, 0.800000f),
+		new Color(0.600000f, 0.600000f, 0.600000f),
+		new Color(0.600000f, 0.600000f, 0.400000f),
+		new Color(0.600000f, 0.600000f, 0.200000f),
+		new Color(0.600000f, 0.600000f, 0.000000f),
+		new Color(0.600000f, 0.400000f, 1.000000f),
+		new Color(0.600000f, 0.400000f, 0.800000f),
+		new Color(0.600000f, 0.400000f, 0.600000f),
+		new Color(0.600000f, 0.400000f, 0.400000f),
+		new Color(0.600000f, 0.400000f, 0.200000f),
+		new Color(0.600000f, 0.400000f, 0.000000f),
+		new Color(0.600000f, 0.200000f, 1.000000f),
+		new Color(0.600000f, 0.200000f, 0.800000f),
+		new Color(0.600000f, 0.200000f, 0.600000f),
+		new Color(0.600000f, 0.200000f, 0.400000f),
+		new Color(0.600000f, 0.200000f, 0.200000f),
+		new Color(0.600000f, 0.200000f, 0.000000f),
+		new Color(0.600000f, 0.000000f, 1.000000f),
+		new Color(0.600000f, 0.000000f, 0.800000f),
+		new Color(0.600000f, 0.000000f, 0.600000f),
+		new Color(0.600000f, 0.000000f, 0.400000f),
+		new Color(0.600000f, 0.000000f, 0.200000f),
+		new Color(0.600000f, 0.000000f, 0.000000f),
+		new Color(0.400000f, 1.000000f, 1.000000f),
+		new Color(0.400000f, 1.000000f, 0.800000f),
+		new Color(0.400000f, 1.000000f, 0.600000f),
+		new Color(0.400000f, 1.000000f, 0.400000f),
+		new Color(0.400000f, 1.000000f, 0.200000f),
+		new Color(0.400000f, 1.000000f, 0.000000f),
+		new Color(0.400000f, 0.800000f, 1.000000f),
+		new Color(0.400000f, 0.800000f, 0.800000f),
+		new Color(0.400000f, 0.800000f, 0.600000f),
+		new Color(0.400000f, 0.800000f, 0.400000f),
+		new Color(0.400000f, 0.800000f, 0.200000f),
+		new Color(0.400000f, 0.800000f, 0.000000f),
+		new Color(0.400000f, 0.600000f, 1.000000f),
+		new Color(0.400000f, 0.600000f, 0.800000f),
+		new Color(0.400000f, 0.600000f, 0.600000f),
+		new Color(0.400000f, 0.600000f, 0.400000f),
+		new Color(0.400000f, 0.600000f, 0.200000f),
+		new Color(0.400000f, 0.600000f, 0.000000f),
+		new Color(0.400000f, 0.400000f, 1.000000f),
+		new Color(0.400000f, 0.400000f, 0.800000f),
+		new Color(0.400000f, 0.400000f, 0.600000f),
+		new Color(0.400000f, 0.400000f, 0.400000f),
+		new Color(0.400000f, 0.400000f, 0.200000f),
+		new Color(0.400000f, 0.400000f, 0.000000f),
+		new Color(0.400000f, 0.200000f, 1.000000f),
+		new Color(0.400000f, 0.200000f, 0.800000f),
+		new Color(0.400000f, 0.200000f, 0.600000f),
+		new Color(0.400000f, 0.200000f, 0.400000f),
+		new Color(0.400000f, 0.200000f, 0.200000f),
+		new Color(0.400000f, 0.200000f, 0.000000f),
+		new Color(0.400000f, 0.000000f, 1.000000f),
+		new Color(0.400000f, 0.000000f, 0.800000f),
+		new Color(0.400000f, 0.000000f, 0.600000f),
+		new Color(0.400000f, 0.000000f, 0.400000f),
+		new Color(0.400000f, 0.000000f, 0.200000f),
+		new Color(0.400000f, 0.000000f, 0.000000f),
+		new Color(0.200000f, 1.000000f, 1.000000f),
+		new Color(0.200000f, 1.000000f, 0.800000f),
+		new Color(0.200000f, 1.000000f, 0.600000f),
+		new Color(0.200000f, 1.000000f, 0.400000f),
+		new Color(0.200000f, 1.000000f, 0.200000f),
+		new Color(0.200000f, 1.000000f, 0.000000f),
+		new Color(0.200000f, 0.800000f, 1.000000f),
+		new Color(0.200000f, 0.800000f, 0.800000f),
+		new Color(0.200000f, 0.800000f, 0.600000f),
+		new Color(0.200000f, 0.800000f, 0.400000f),
+		new Color(0.200000f, 0.800000f, 0.200000f),
+		new Color(0.200000f, 0.800000f, 0.000000f),
+		new Color(0.200000f, 0.600000f, 1.000000f),
+		new Color(0.200000f, 0.600000f, 0.800000f),
+		new Color(0.200000f, 0.600000f, 0.600000f),
+		new Color(0.200000f, 0.600000f, 0.400000f),
+		new Color(0.200000f, 0.600000f, 0.200000f),
+		new Color(0.200000f, 0.600000f, 0.000000f),
+		new Color(0.200000f, 0.400000f, 1.000000f),
+		new Color(0.200000f, 0.400000f, 0.800000f),
+		new Color(0.200000f, 0.400000f, 0.600000f),
+		new Color(0.200000f, 0.400000f, 0.400000f),
+		new Color(0.200000f, 0.400000f, 0.200000f),
+		new Color(0.200000f, 0.400000f, 0.000000f),
+		new Color(0.200000f, 0.200000f, 1.000000f),
+		new Color(0.200000f, 0.200000f, 0.800000f),
+		new Color(0.200000f, 0.200000f, 0.600000f),
+		new Color(0.200000f, 0.200000f, 0.400000f),
+		new Color(0.200000f, 0.200000f, 0.200000f),
+		new Color(0.200000f, 0.200000f, 0.000000f),
+		new Color(0.200000f, 0.000000f, 1.000000f),
+		new Color(0.200000f, 0.000000f, 0.800000f),
+		new Color(0.200000f, 0.000000f, 0.600000f),
+		new Color(0.200000f, 0.000000f, 0.400000f),
+		new Color(0.200000f, 0.000000f, 0.200000f),
+		new Color(0.200000f, 0.000000f, 0.000000f),
+		new Color(0.000000f, 1.000000f, 1.000000f),
+		new Color(0.000000f, 1.000000f, 0.800000f),
+		new Color(0.000000f, 1.000000f, 0.600000f),
+		new Color(0.000000f, 1.000000f, 0.400000f),
+		new Color(0.000000f, 1.000000f, 0.200000f),
+		new Color(0.000000f, 1.000000f, 0.000000f),
+		new Color(0.000000f, 0.800000f, 1.000000f),
+		new Color(0.000000f, 0.800000f, 0.800000f),
+		new Color(0.000000f, 0.800000f, 0.600000f),
+		new Color(0.000000f, 0.800000f, 0.400000f),
+		new Color(0.000000f, 0.800000f, 0.200000f),
+		new Color(0.000000f, 0.800000f, 0.000000f),
+		new Color(0.000000f, 0.600000f, 1.000000f),
+		new Color(0.000000f, 0.600000f, 0.800000f),
+		new Color(0.000000f, 0.600000f, 0.600000f),
+		new Color(0.000000f, 0.600000f, 0.400000f),
+		new Color(0.000000f, 0.600000f, 0.200000f),
+		new Color(0.000000f, 0.600000f, 0.000000f),
+		new Color(0.000000f, 0.400000f, 1.000000f),
+		new Color(0.000000f, 0.400000f, 0.800000f),
+		new Color(0.000000f, 0.400000f, 0.600000f),
+		new Color(0.000000f, 0.400000f, 0.400000f),
+		new Color(0.000000f, 0.400000f, 0.200000f),
+		new Color(0.000000f, 0.400000f, 0.000000f),
+		new Color(0.000000f, 0.200000f, 1.000000f),
+		new Color(0.000000f, 0.200000f, 0.800000f),
+		new Color(0.000000f, 0.200000f, 0.600000f),
+		new Color(0.000000f, 0.200000f, 0.400000f),
+		new Color(0.000000f, 0.200000f, 0.200000f),
+		new Color(0.000000f, 0.200000f, 0.000000f),
+		new Color(0.000000f, 0.000000f, 1.000000f),
+		new Color(0.000000f, 0.000000f, 0.800000f),
+		new Color(0.000000f, 0.000000f, 0.600000f),
+		new Color(0.000000f, 0.000000f, 0.400000f),
+		new Color(0.000000f, 0.000000f, 0.200000f),
+		new Color(0.933333f, 0.000000f, 0.000000f),
+		new Color(0.866667f, 0.000000f, 0.000000f),
+		new Color(0.733333f, 0.000000f, 0.000000f),
+		new Color(0.666667f, 0.000000f, 0.000000f),
+		new Color(0.533333f, 0.000000f, 0.000000f),
+		new Color(0.466667f, 0.000000f, 0.000000f),
+		new Color(0.333333f, 0.000000f, 0.000000f),
+		new Color(0.266667f, 0.000000f, 0.000000f),
+		new Color(0.133333f, 0.000000f, 0.000000f),
+		new Color(0.066667f, 0.000000f, 0.000000f),
+		new Color(0.000000f, 0.933333f, 0.000000f),
+		new Color(0.000000f, 0.866667f, 0.000000f),
+		new Color(0.000000f, 0.733333f, 0.000000f),
+		new Color(0.000000f, 0.666667f, 0.000000f),
+		new Color(0.000000f, 0.533333f, 0.000000f),
+		new Color(0.000000f, 0.466667f, 0.000000f),
+		new Color(0.000000f, 0.333333f, 0.000000f),
+		new Color(0.000000f, 0.266667f, 0.000000f),
+		new Color(0.000000f, 0.133333f, 0.000000f),
+		new Color(0.000000f, 0.066667f, 0.000000f),
+		new Color(0.000000f, 0.000000f, 0.933333f),
+		new Color(0.000000f, 0.000000f, 0.866667f),
+		new Color(0.000000f, 0.000000f, 0.733333f),
+		new Color(0.000000f, 0.000000f, 0.666667f),
+		new Color(0.000000f, 0.000000f, 0.533333f),
+		new Color(0.000000f, 0.000000f, 0.466667f),
+		new Color(0.000000f, 0.000000f, 0.333333f),
+		new Color(0.000000f, 0.000000f, 0.266667f),
+		new Color(0.000000f, 0.000000f, 0.133333f),
+		new Color(0.000000f, 0.000000f, 0.066667f),
+		new Color(0.933333f, 0.933333f, 0.933333f),
+		new Color(0.866667f, 0.866667f, 0.866667f),
+		new Color(0.733333f, 0.733333f, 0.733333f),
+		new Color(0.666667f, 0.666667f, 0.666667f),
+		new Color(0.533333f, 0.533333f, 0.533333f),
+		new Color(0.466667f, 0.466667f, 0.466667f),
+		new Color(0.333333f, 0.333333f, 0.333333f),
+		new Color(0.266667f, 0.266667f, 0.266667f),
+		new Color(0.133333f, 0.133333f, 0.133333f),
+		new Color(0.066667f, 0.066667f, 0.066667f),
+		new Color(0.000000f, 0.000000f, 0.000000f)
 	};
 #endregion
 }
@@ -330,11 +316,6 @@ public static class MVImporter
 		   bytes [3] != ' ') {
 			throw new FileLoadException ("Invalid VOX file, magic number mismatch");
 		}
-
-		MVColor[] colors = new MVColor[] { 
-			new MVColor { r = 0xFF, g = 0x1,  b= 0x1, a = 0x1 }, 
-			new MVColor { r = 0xFF, g = 0x1,  b= 0x1, a = 0x1 } 
-		};
 
 		using (MemoryStream ms = new MemoryStream (bytes)) {
 			using (BinaryReader br = new BinaryReader (ms)) {
@@ -381,6 +362,7 @@ public static class MVImporter
 					        chunkId [2] == 'B' &&
 					        chunkId [3] == 'A') {
 
+						mainChunk.palatte = new Color[256];
 						readSize += ReadPalattee (br, mainChunk.palatte);
 
 					}
@@ -400,10 +382,34 @@ public static class MVImporter
 
 	static void GenerateFaces(MVVoxelChunk voxelChunk)
 	{
+		voxelChunk.faces = new MVFaceCollection[6];
+		for (int i = 0; i < 6; ++i) {
+			voxelChunk.faces [i].colorIndices = new byte[voxelChunk.sizeX, voxelChunk.sizeY, voxelChunk.sizeZ];
+		}
+
 		for (int x = 0; x < voxelChunk.sizeX; ++x) {
-			for (int y = 0; y < voxelChunk.sizeX; ++y) {
-				for (int z = 0; z < voxelChunk.sizeX; ++z) {
-					
+			for (int y = 0; y < voxelChunk.sizeY; ++y) {
+				for (int z = 0; z < voxelChunk.sizeZ; ++z) {
+					// left right
+					if(x == 0 || voxelChunk.voxels[x-1,y,z] == 0)
+						voxelChunk.faces [(int)MVFaceDir.XNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];	
+
+					if (x == voxelChunk.sizeX - 1 || voxelChunk.voxels [x + 1, y, z] == 0)
+						voxelChunk.faces [(int)MVFaceDir.XPos].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];
+
+					// up down
+					if(y == 0 || voxelChunk.voxels[x,y-1,z] == 0)
+						voxelChunk.faces [(int)MVFaceDir.YNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];	
+
+					if (y == voxelChunk.sizeY - 1 || voxelChunk.voxels [x, y+1, z] == 0)
+						voxelChunk.faces [(int)MVFaceDir.YPos].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];
+
+					// forward backward
+					if(z == 0 || voxelChunk.voxels[x,y,z-1] == 0)
+						voxelChunk.faces [(int)MVFaceDir.ZNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];	
+
+					if (z == voxelChunk.sizeZ - 1 || voxelChunk.voxels [x, y, z+1] == 0)
+						voxelChunk.faces [(int)MVFaceDir.ZPos].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];
 				}
 			}
 		}
@@ -420,14 +426,14 @@ public static class MVImporter
 
 		mainChunk.voxelChunk = new MVVoxelChunk ();
 		mainChunk.voxelChunk.voxels = new byte[mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ];
-		for (int x = 0; x < mainChunk.sizeX; ++x) {
-			for (int y = 0; y < mainChunk.sizeX; ++y) {
-				for (int z = 0; z < mainChunk.sizeX; ++z) {
-					mainChunk.voxelChunk.voxels [x, y, z] = 0;
-				}
-			}
-		}
-
+//		for (int x = 0; x < mainChunk.sizeX; ++x) {
+//			for (int y = 0; y < mainChunk.sizeX; ++y) {
+//				for (int z = 0; z < mainChunk.sizeX; ++z) {
+//					mainChunk.voxelChunk.voxels [x, y, z] = 0;
+//				}
+//			}
+//		}
+//
 		Debug.Log (string.Format ("[MVImporter] Voxel Size {0}x{1}x{2}", mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ));
 
 		if (childrenSize > 0) {
@@ -461,16 +467,13 @@ public static class MVImporter
 		return chunkSize + childrenSize + 4 * 3;
 	}
 
-	static int ReadPalattee(BinaryReader br, MVColor[] colors)
+	static int ReadPalattee(BinaryReader br, Color[] colors)
 	{
 		int chunkSize = br.ReadInt32 ();
 		int childrenSize = br.ReadInt32 ();
 
 		for (int i = 0; i < 256; ++i) {
-			colors [i].r = br.ReadByte ();
-			colors [i].g = br.ReadByte ();
-			colors [i].b = br.ReadByte ();
-			colors [i].a = br.ReadByte ();
+			colors [i] = new Color ((float)br.ReadByte () / 255.0f, (float)br.ReadByte () / 255.0f, (float)br.ReadByte () / 255.0f, (float)br.ReadByte () / 255.0f);
 		}
 
 		if (childrenSize > 0) {
@@ -486,9 +489,112 @@ public static class MVImporter
 		return null;
 	}
 
-	public static Mesh CreateMeshFromChunk(MVVoxelChunk chunk, MVColor[] palatte)
+	public static Mesh CreateMeshFromChunk(MVVoxelChunk chunk, Color[] palatte)
 	{
-		return null;
+		List<Vector3> verts = new List<Vector3> ();
+		List<Vector3> normals = new List<Vector3> ();
+		List<Color> colors = new List<Color> ();
+		List<int> indicies = new List<int> ();
+
+		Vector3[] faceNormals = new Vector3[] {
+			Vector3.right,
+			Vector3.left,
+			Vector3.up,
+			Vector3.down,
+			Vector3.forward,
+			Vector3.back
+		};
+
+		float halfSize = 0.5f;
+
+		int totalQuadCount = 0;
+		for (int f = 0; f < 6; ++f) {
+			for (int x = 0; x < chunk.sizeX; ++x) {
+				for (int y = 0; y < chunk.sizeY; ++y) {
+					for (int z = 0; z < chunk.sizeZ; ++z) {
+						// left
+						if (chunk.faces [f].colorIndices [x, y, z] != 0) {
+							switch (f) {
+							case 1:
+								verts.Add (new Vector3 (x - halfSize, y - halfSize, z - halfSize));
+								verts.Add (new Vector3 (x - halfSize, y - halfSize, z + halfSize));
+								verts.Add (new Vector3 (x - halfSize, y + halfSize, z + halfSize));
+								verts.Add (new Vector3 (x - halfSize, y + halfSize, z - halfSize));
+								break;
+
+							case 0:
+								verts.Add (new Vector3 (x + halfSize, y - halfSize, z - halfSize));
+								verts.Add (new Vector3 (x + halfSize, y + halfSize, z - halfSize));
+								verts.Add (new Vector3 (x + halfSize, y + halfSize, z + halfSize));
+								verts.Add (new Vector3 (x + halfSize, y - halfSize, z + halfSize));
+								break;
+
+							case 3:
+								verts.Add (new Vector3 (x + halfSize, y - halfSize, z - halfSize));
+								verts.Add (new Vector3 (x + halfSize, y - halfSize, z + halfSize));
+								verts.Add (new Vector3 (x - halfSize, y - halfSize, z + halfSize));
+								verts.Add (new Vector3 (x - halfSize, y - halfSize, z - halfSize));
+								break;
+
+							case 2:
+								verts.Add (new Vector3 (x + halfSize, y + halfSize, z - halfSize));
+								verts.Add (new Vector3 (x - halfSize, y + halfSize, z - halfSize));
+								verts.Add (new Vector3 (x - halfSize, y + halfSize, z + halfSize));
+								verts.Add (new Vector3 (x + halfSize, y + halfSize, z + halfSize));
+								break;
+
+							case 5:
+								verts.Add (new Vector3 (x - halfSize, y + halfSize, z - halfSize));
+								verts.Add (new Vector3 (x + halfSize, y + halfSize, z - halfSize));
+								verts.Add (new Vector3 (x + halfSize, y - halfSize, z - halfSize));
+								verts.Add (new Vector3 (x - halfSize, y - halfSize, z - halfSize));
+								break;
+
+							case 4:
+								verts.Add (new Vector3 (x - halfSize, y + halfSize, z + halfSize));
+								verts.Add (new Vector3 (x - halfSize, y - halfSize, z + halfSize));
+								verts.Add (new Vector3 (x + halfSize, y - halfSize, z + halfSize));
+								verts.Add (new Vector3 (x + halfSize, y + halfSize, z + halfSize));
+								break;
+							}
+
+							normals.Add (faceNormals [f]);
+							normals.Add (faceNormals [f]);
+							normals.Add (faceNormals [f]);
+							normals.Add (faceNormals [f]);
+
+							// color index starts with 1
+							Color c = palatte [chunk.faces [f].colorIndices [x, y, z] - 1];
+
+							colors.Add (c);
+							colors.Add (c);
+							colors.Add (c);
+							colors.Add (c);
+
+							indicies.Add (totalQuadCount * 4 + 0);
+							indicies.Add (totalQuadCount * 4 + 1);
+							indicies.Add (totalQuadCount * 4 + 2);
+							indicies.Add (totalQuadCount * 4 + 2);
+							indicies.Add (totalQuadCount * 4 + 3);
+							indicies.Add (totalQuadCount * 4 + 0);
+
+							totalQuadCount += 1;
+						}
+					}
+				}
+			}
+		}
+
+		Debug.Log (string.Format ("[MVImport] Mesh generated, total quads {0}", totalQuadCount));
+
+		Mesh mesh = new Mesh ();
+		mesh.vertices = verts.ToArray();
+		mesh.colors = colors.ToArray();
+		mesh.normals = normals.ToArray();
+		mesh.triangles = indicies.ToArray ();
+		mesh.Optimize ();
+
+		return mesh;
 	}
 
 	public static bool ExportToObj(MVMainChunk mv)
