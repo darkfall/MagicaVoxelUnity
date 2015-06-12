@@ -426,14 +426,7 @@ public static class MVImporter
 
 		mainChunk.voxelChunk = new MVVoxelChunk ();
 		mainChunk.voxelChunk.voxels = new byte[mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ];
-//		for (int x = 0; x < mainChunk.sizeX; ++x) {
-//			for (int y = 0; y < mainChunk.sizeX; ++y) {
-//				for (int z = 0; z < mainChunk.sizeX; ++z) {
-//					mainChunk.voxelChunk.voxels [x, y, z] = 0;
-//				}
-//			}
-//		}
-//
+
 		Debug.Log (string.Format ("[MVImporter] Voxel Size {0}x{1}x{2}", mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ));
 
 		if (childrenSize > 0) {
@@ -453,8 +446,8 @@ public static class MVImporter
 
 		for (int i = 0; i < numVoxels; ++i) {
 			int x = (int)br.ReadByte ();
-			int y = (int)br.ReadByte ();
 			int z = (int)br.ReadByte ();
+			int y = (int)br.ReadByte ();
 
 			chunk.voxels [x, y, z] = br.ReadByte();
 		}
@@ -484,12 +477,12 @@ public static class MVImporter
 		return chunkSize + childrenSize + 4 * 3;
 	}
 
-	public static Mesh CreateMesh(MVMainChunk chunk)
+	public static Mesh[] CreateMeshes(MVMainChunk chunk, float sizePerVox)
 	{
-		return null;
+		return CreateMeshesFromChunk (chunk.voxelChunk, chunk.palatte, sizePerVox);
 	}
 
-	public static Mesh CreateMeshFromChunk(MVVoxelChunk chunk, Color[] palatte)
+	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox)
 	{
 		List<Vector3> verts = new List<Vector3> ();
 		List<Vector3> normals = new List<Vector3> ();
@@ -505,7 +498,15 @@ public static class MVImporter
 			Vector3.back
 		};
 
-		float halfSize = 0.5f;
+		List<Mesh> result = new List<Mesh> ();
+
+		if (sizePerVox <= 0.0f)
+			sizePerVox = 0.1f;
+		
+		float halfSize = sizePerVox / 2.0f;
+		float cx = sizePerVox * chunk.sizeX / 2;
+		float cy = sizePerVox * chunk.sizeY / 2;
+		float cz = sizePerVox * chunk.sizeZ / 2;
 
 		int totalQuadCount = 0;
 		for (int f = 0; f < 6; ++f) {
@@ -514,47 +515,49 @@ public static class MVImporter
 					for (int z = 0; z < chunk.sizeZ; ++z) {
 						// left
 						if (chunk.faces [f].colorIndices [x, y, z] != 0) {
+							float px = x * sizePerVox - cx, py = y * sizePerVox - cy, pz = z * sizePerVox - cz;
+
 							switch (f) {
 							case 1:
-								verts.Add (new Vector3 (x - halfSize, y - halfSize, z - halfSize));
-								verts.Add (new Vector3 (x - halfSize, y - halfSize, z + halfSize));
-								verts.Add (new Vector3 (x - halfSize, y + halfSize, z + halfSize));
-								verts.Add (new Vector3 (x - halfSize, y + halfSize, z - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz - halfSize));
 								break;
 
 							case 0:
-								verts.Add (new Vector3 (x + halfSize, y - halfSize, z - halfSize));
-								verts.Add (new Vector3 (x + halfSize, y + halfSize, z - halfSize));
-								verts.Add (new Vector3 (x + halfSize, y + halfSize, z + halfSize));
-								verts.Add (new Vector3 (x + halfSize, y - halfSize, z + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize));
 								break;
 
 							case 3:
-								verts.Add (new Vector3 (x + halfSize, y - halfSize, z - halfSize));
-								verts.Add (new Vector3 (x + halfSize, y - halfSize, z + halfSize));
-								verts.Add (new Vector3 (x - halfSize, y - halfSize, z + halfSize));
-								verts.Add (new Vector3 (x - halfSize, y - halfSize, z - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz - halfSize));
 								break;
 
 							case 2:
-								verts.Add (new Vector3 (x + halfSize, y + halfSize, z - halfSize));
-								verts.Add (new Vector3 (x - halfSize, y + halfSize, z - halfSize));
-								verts.Add (new Vector3 (x - halfSize, y + halfSize, z + halfSize));
-								verts.Add (new Vector3 (x + halfSize, y + halfSize, z + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz + halfSize));
 								break;
 
 							case 5:
-								verts.Add (new Vector3 (x - halfSize, y + halfSize, z - halfSize));
-								verts.Add (new Vector3 (x + halfSize, y + halfSize, z - halfSize));
-								verts.Add (new Vector3 (x + halfSize, y - halfSize, z - halfSize));
-								verts.Add (new Vector3 (x - halfSize, y - halfSize, z - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz - halfSize));
 								break;
 
 							case 4:
-								verts.Add (new Vector3 (x - halfSize, y + halfSize, z + halfSize));
-								verts.Add (new Vector3 (x - halfSize, y - halfSize, z + halfSize));
-								verts.Add (new Vector3 (x + halfSize, y - halfSize, z + halfSize));
-								verts.Add (new Vector3 (x + halfSize, y + halfSize, z + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz + halfSize));
 								break;
 							}
 
@@ -579,27 +582,42 @@ public static class MVImporter
 							indicies.Add (totalQuadCount * 4 + 0);
 
 							totalQuadCount += 1;
+
+							// u3d max
+							if (verts.Count + 4 >= 65000) {
+								Mesh mesh = new Mesh ();
+								mesh.vertices = verts.ToArray();
+								mesh.colors = colors.ToArray();
+								mesh.normals = normals.ToArray();
+								mesh.triangles = indicies.ToArray ();
+								mesh.Optimize ();
+								result.Add (mesh);
+
+								verts.Clear ();
+								colors.Clear ();
+								normals.Clear ();
+								indicies.Clear ();
+								totalQuadCount = 0;
+							}
 						}
 					}
 				}
 			}
 		}
 
+		if (verts.Count > 0) {
+			Mesh mesh = new Mesh ();
+			mesh.vertices = verts.ToArray();
+			mesh.colors = colors.ToArray();
+			mesh.normals = normals.ToArray();
+			mesh.triangles = indicies.ToArray ();
+			mesh.Optimize ();
+			result.Add (mesh);
+		}
+
 		Debug.Log (string.Format ("[MVImport] Mesh generated, total quads {0}", totalQuadCount));
 
-		Mesh mesh = new Mesh ();
-		mesh.vertices = verts.ToArray();
-		mesh.colors = colors.ToArray();
-		mesh.normals = normals.ToArray();
-		mesh.triangles = indicies.ToArray ();
-		mesh.Optimize ();
-
-		return mesh;
-	}
-
-	public static bool ExportToObj(MVMainChunk mv)
-	{
-		return false;
+		return result.ToArray();
 	}
 }
 
