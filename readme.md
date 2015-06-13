@@ -11,14 +11,29 @@ Unity3D plugin for MagicaVoxel's "vox" format
 * Add MVVoxelModel script to your component 
 	* Use editor controls to load "vox" files onto the object
 
-* Use MVVoxelModel's member methods
+	* Or use MVVoxelModel's member methods
 
-		LoadVOXFile(filePath, importAsIndividualVoxels)
-		LoadVOXData(data, importAsIndividualVoxels)
+			LoadVOXFile(filePath, importAsIndividualVoxels)
+			LoadVOXData(data, importAsIndividualVoxels)
 
-	* MVVoxelModel.sizePerVoxel and MVVoxelModel.voxMaterial can be configured before loading the file/data
+			MVVoxelModel.sizePerVoxel and MVVoxelModel.voxMaterial can be configured before loading the file/data
+			
+* Use static methods in MVImporter
 
-
+		Load main chunk:
+		
+			LoadVOX(file)
+			LoadVOXFromData(data)
+			
+		Create meshes from main chunk:
+		
+			CreateMeshes(mainChunk, sizePerVox)
+			
+		Or create meshes and GameObjects from main chunk:
+		
+			CreateVoxelGameObjects(mainChunk, parentTransform, material, sizePerVox)
+			CreateIndividualVoxelGameObjects(mainChunk, parentTransform, material, sizePerVox)
+		
 	
 #### License
 
