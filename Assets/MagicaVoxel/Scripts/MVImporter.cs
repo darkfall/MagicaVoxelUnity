@@ -316,17 +316,8 @@ public class MVMainChunk
 public static class MVImporter 
 {
 
-	public static MVMainChunk LoadVOX(string path)
-	{
-		byte[] bytes = File.ReadAllBytes (path);
-		if (bytes [0] != 'V' ||
-		   bytes [1] != 'O' ||
-		   bytes [2] != 'X' ||
-		   bytes [3] != ' ') {
-			throw new FileLoadException ("Invalid VOX file, magic number mismatch");
-		}
-
-		using (MemoryStream ms = new MemoryStream (bytes)) {
+	public static MVMainChunk LoadVOXFromData(byte[] data) {
+		using (MemoryStream ms = new MemoryStream (data)) {
 			using (BinaryReader br = new BinaryReader (ms)) {
 				MVMainChunk mainChunk = new MVMainChunk ();
 
@@ -337,10 +328,11 @@ public static class MVImporter
 
 				byte[] chunkId = br.ReadBytes (4);
 				if (chunkId [0] != 'M' ||
-				   chunkId [1] != 'A' ||
-				   chunkId [2] != 'I' ||
-				   chunkId [3] != 'N') {
-					throw new FileLoadException ("Invalid MainChunk ID, main chunk expected");
+					chunkId [1] != 'A' ||
+					chunkId [2] != 'I' ||
+					chunkId [3] != 'N') {
+					Debug.LogError ("[MVImport] Invalid MainChunk ID, main chunk expected");
+					return null;
 				}
 
 				int chunkSize = br.ReadInt32 ();
@@ -353,30 +345,31 @@ public static class MVImporter
 				while (readSize < childrenSize) {
 					chunkId = br.ReadBytes (4);
 					if (chunkId [0] == 'S' &&
-					    chunkId [1] == 'I' &&
-					    chunkId [2] == 'Z' &&
-					    chunkId [3] == 'E') {
+						chunkId [1] == 'I' &&
+						chunkId [2] == 'Z' &&
+						chunkId [3] == 'E') {
 
 						readSize += ReadSizeChunk (br, mainChunk);
 
 					} else if (chunkId [0] == 'X' &&
-					        chunkId [1] == 'Y' &&
-					        chunkId [2] == 'Z' &&
-					        chunkId [3] == 'I') {
+						chunkId [1] == 'Y' &&
+						chunkId [2] == 'Z' &&
+						chunkId [3] == 'I') {
 
 						readSize += ReadVoxelChunk (br, mainChunk.voxelChunk);
 
 					} else if (chunkId [0] == 'R' &&
-					        chunkId [1] == 'G' &&
-					        chunkId [2] == 'B' &&
-					        chunkId [3] == 'A') {
+						chunkId [1] == 'G' &&
+						chunkId [2] == 'B' &&
+						chunkId [3] == 'A') {
 
 						mainChunk.palatte = new Color[256];
 						readSize += ReadPalattee (br, mainChunk.palatte);
 
 					}
 					else {
-						throw new FileLoadException ("Chunk ID not recognized, got " + System.Text.Encoding.ASCII.GetString(chunkId));
+						Debug.LogError ("[MVImport] Chunk ID not recognized, got " + System.Text.Encoding.ASCII.GetString(chunkId));
+						return null;
 					}
 				}
 
@@ -387,6 +380,20 @@ public static class MVImporter
 				return mainChunk;
 			}
 		}
+	}
+
+	public static MVMainChunk LoadVOX(string path)
+	{
+		byte[] bytes = File.ReadAllBytes (path);
+		if (bytes [0] != 'V' ||
+			bytes [1] != 'O' ||
+			bytes [2] != 'X' ||
+			bytes [3] != ' ') {
+			Debug.LogError ("Invalid VOX file, magic number mismatch");
+			return null;
+		}
+
+		return LoadVOXFromData (bytes);
 	}
 
 	public static void GenerateFaces(MVVoxelChunk voxelChunk)
@@ -495,6 +502,11 @@ public static class MVImporter
 		return CreateVoxelGameObjectsForChunk (chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox);
 	}
 
+	public static GameObject[] CreateIndividualVoxelGameObjects(MVMainChunk chunk, Transform parent, Material mat, float sizePerVox)
+	{
+		return CreateIndividualVoxelGameObjectsForChunk (chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox);
+	}
+
 	public static Mesh CubeMeshWithColor(float size, Color c) {
 		float halfSize = size / 2;
 
@@ -559,7 +571,7 @@ public static class MVImporter
 		return go;
 	}
 
-	public static GameObject[] CreateVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox) {
+	public static GameObject[] CreateIndividualVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox) {
 		List<GameObject> result = new List<GameObject> ();
 
 		float cx = sizePerVox * chunk.sizeX / 2;
@@ -590,6 +602,33 @@ public static class MVImporter
 		}
 
 		return result.ToArray();
+	}
+
+
+	public static GameObject[] CreateVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox) {
+		List<GameObject> result = new List<GameObject> ();
+
+		Mesh[] meshes = CreateMeshesFromChunk (chunk, palatte, sizePerVox);
+
+		int index = 0;
+		foreach (Mesh mesh in meshes) {
+			GameObject go = new GameObject ();
+			go.name = string.Format ("VoxelMesh ({0})", index);
+			go.transform.SetParent (parent);
+			go.transform.localPosition = Vector3.zero;
+
+			MeshFilter mf = go.AddComponent<MeshFilter> ();
+			mf.mesh = mesh;
+
+			MeshRenderer mr = go.AddComponent<MeshRenderer> ();
+			mr.material = mat;
+
+			go.AddComponent<MVVoxModelMesh> ();
+			result.Add (go);
+			index++;
+		}
+
+		return result.ToArray ();
 	}
 
 	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox)

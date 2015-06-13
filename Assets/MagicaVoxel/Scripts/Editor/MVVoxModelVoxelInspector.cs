@@ -48,19 +48,14 @@ public class MVVoxModelVoxelInspector : Editor {
 				return;
 			}
 
-			string filename = System.IO.Path.GetFileNameWithoutExtension (model.filePath);
-
 			Material mat = (model.defaultMaterial != null) ? model.defaultMaterial : new Material (Shader.Find ("MagicaVoxel/FlatColor"));
 
 			int index = 0;
 			foreach (Mesh mesh in meshes) {
-				GameObject go = MVImporter.CreateGameObject (model.gameObject.transform, Vector3.zero, string.Format ("{0} ({1})", filename, index), mesh, mat);
+				GameObject go = MVImporter.CreateGameObject (model.gameObject.transform, Vector3.zero, string.Format ("VoxMesh ({0})", index), mesh, mat);
 
 				MVVoxModelMesh voxMesh = go.AddComponent<MVVoxModelMesh> ();
 				voxMesh.voxels = voxels.Select( o => o.voxel ).ToArray();
-
-				if(model.addBoxColliders)
-					go.AddComponent<BoxCollider> ();
 
 				Selection.activeGameObject = go;
 
