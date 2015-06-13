@@ -3,19 +3,27 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 
+[System.Serializable]
 public struct MVFaceCollection
 {
 	public byte[,,] colorIndices;
 }
 
+[System.Serializable]
+public struct MVVoxel {
+	public byte x, y, z, colorIndex;
+}
+
+[System.Serializable]
 public class MVVoxelChunk
 {
 	// all voxels
 	public byte[,,] voxels;
-	public MVVoxelChunk[] childChunks;
 
 	// 6 dir, x+. x-, y+, y-, z+, z-
 	public MVFaceCollection[] faces;
+
+	public int x = 0, y = 0, z = 0;
 
 	public int sizeX { get { return voxels.GetLength (0); } }
 	public int sizeY { get { return voxels.GetLength (1); } }
@@ -32,6 +40,7 @@ public enum MVFaceDir
 	ZNeg = 5
 }
 	
+[System.Serializable]
 public class MVMainChunk
 {
 	public MVVoxelChunk voxelChunk;
@@ -380,7 +389,7 @@ public static class MVImporter
 		}
 	}
 
-	static void GenerateFaces(MVVoxelChunk voxelChunk)
+	public static void GenerateFaces(MVVoxelChunk voxelChunk)
 	{
 		voxelChunk.faces = new MVFaceCollection[6];
 		for (int i = 0; i < 6; ++i) {
@@ -480,6 +489,54 @@ public static class MVImporter
 	public static Mesh[] CreateMeshes(MVMainChunk chunk, float sizePerVox)
 	{
 		return CreateMeshesFromChunk (chunk.voxelChunk, chunk.palatte, sizePerVox);
+	}
+
+	public static Mesh CubeMeshWithColor(float size, Color c) {
+		float halfSize = size / 2;
+
+		Vector3[] verts = new Vector3[] {
+			new Vector3 (-halfSize, -halfSize, -halfSize),
+			new Vector3 (-halfSize, halfSize, -halfSize),
+			new Vector3 (halfSize, halfSize, -halfSize),
+			new Vector3 (halfSize, -halfSize, -halfSize),
+			new Vector3 (halfSize, -halfSize, halfSize),
+			new Vector3 (halfSize, halfSize, halfSize),
+			new Vector3 (-halfSize, halfSize, halfSize),
+			new Vector3 (-halfSize, -halfSize, halfSize)
+		};
+
+		int[] indicies = new int[] {
+			0, 1, 2, //   1
+			0, 2, 3,
+			3, 2, 5, //   2
+			3, 5, 4,
+			5, 2, 1, //   3
+			5, 1, 6,
+			3, 4, 7, //   4
+			3, 7, 0,
+			0, 7, 6, //   5
+			0, 6, 1,
+			4, 5, 6, //   6
+			4, 6, 7
+		};
+
+		Color[] colors = new Color[] {
+			c,
+			c,
+			c,
+			c,
+			c,
+			c,
+			c,
+			c
+		};
+
+		Mesh mesh = new Mesh ();
+		mesh.vertices = verts;
+		mesh.colors = colors;
+		mesh.triangles = indicies;
+		mesh.RecalculateNormals ();	
+		return mesh;
 	}
 
 	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox)

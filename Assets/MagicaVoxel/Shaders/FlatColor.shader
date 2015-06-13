@@ -1,6 +1,8 @@
 ﻿Shader "MagicaVoxel/FlatColor" {
 	Properties {
 
+		_Color ("MainColor", Color) = (1,1,1,1)
+		
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }
@@ -40,10 +42,12 @@
 				float4 color : COLOR;
 			};
 
-			FragOut fragPass(float4 color : COLOR)
+			fixed4 _Color;
+
+			FragOut fragPass(float4 vertColor : COLOR)
 			{
 				FragOut output;
-				output.color = color;
+				output.color = vertColor * _Color;
 				return output;
 			}
 
