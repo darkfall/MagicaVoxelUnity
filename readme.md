@@ -18,6 +18,9 @@ Unity3D plugin for MagicaVoxel's "vox" format
 
 			MVVoxelModel.sizePerVoxel and MVVoxelModel.voxMaterial can be configured before loading the file/data
 			
+* When imported as separate voxels, selecting multiple voxels in the editor will give you a control to combine the selected voxels into a single mesh
+	* The mesh can be divided into separate voxels again
+			
 * Use static methods in MVImporter
 
 		Load main chunk:
