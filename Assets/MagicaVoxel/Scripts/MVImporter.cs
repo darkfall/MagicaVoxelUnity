@@ -315,6 +315,11 @@ public class MVMainChunk
 
 public static class MVImporter 
 {
+	public static Material DefaultMaterial {
+		get {
+			return new Material (Shader.Find ("MagicaVoxel/FlatColor"));
+		}
+	}
 
 	public static MVMainChunk LoadVOXFromData(byte[] data) {
 		using (MemoryStream ms = new MemoryStream (data)) {

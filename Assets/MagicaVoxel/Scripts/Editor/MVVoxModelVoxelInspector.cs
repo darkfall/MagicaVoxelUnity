@@ -48,7 +48,7 @@ public class MVVoxModelVoxelInspector : Editor {
 				return;
 			}
 
-			Material mat = (model.defaultMaterial != null) ? model.defaultMaterial : new Material (Shader.Find ("MagicaVoxel/FlatColor"));
+			Material mat = (model.voxMaterial != null) ? model.voxMaterial : MVImporter.DefaultMaterial;
 
 			int index = 0;
 			foreach (Mesh mesh in meshes) {

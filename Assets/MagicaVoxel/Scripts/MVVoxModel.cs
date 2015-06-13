@@ -20,7 +20,7 @@ public class MVVoxModel : MonoBehaviour {
 	[Range(0.01f, 5.0f)]
 	public float sizePerVox = 1.0f;
 
-	public Material defaultMaterial = null;
+	public Material voxMaterial = null;
 
 
 	public void ClearVoxMeshes() {
@@ -41,7 +41,7 @@ public class MVVoxModel : MonoBehaviour {
 			MVMainChunk v = MVImporter.LoadVOX (path);
 
 			if (v != null) {
-				Material mat = (this.defaultMaterial != null) ? this.defaultMaterial : new Material (Shader.Find ("MagicaVoxel/FlatColor"));
+				Material mat = (this.voxMaterial != null) ? this.voxMaterial : MVImporter.DefaultMaterial;
 				if (!asIndividualVoxels) {
 
 					MVImporter.CreateVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
@@ -67,7 +67,7 @@ public class MVVoxModel : MonoBehaviour {
 		MVMainChunk v = MVImporter.LoadVOXFromData(data);
 
 		if (v != null) {
-			Material mat = (this.defaultMaterial != null) ? this.defaultMaterial : new Material (Shader.Find ("MagicaVoxel/FlatColor"));
+			Material mat = (this.voxMaterial != null) ? this.voxMaterial : MVImporter.DefaultMaterial;
 			if (!asIndividualVoxels) {
 
 				MVImporter.CreateVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
