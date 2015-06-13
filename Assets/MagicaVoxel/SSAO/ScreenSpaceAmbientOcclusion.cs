@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 
-namespace UnityStandardAssets.ImageEffects
+// from Unity standard assets, renamed to avoid conflicts
+namespace MagicaVoxel
 {
     [ExecuteInEditMode]
     [RequireComponent (typeof(Camera))]
-    [AddComponentMenu("Image Effects/Rendering/Screen Space Ambient Occlusion")]
     public class ScreenSpaceAmbientOcclusion : MonoBehaviour
     {
         public enum SSAOSamples

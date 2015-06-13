@@ -14,7 +14,7 @@ public class MVVoxModelInspector : Editor {
 		if(voxModel.vox != null)
 			AU.AUEditorUtility.ColoredLabel (string.Format("Vox Controls ({0}x{1}x{2})", voxModel.vox.sizeX, voxModel.vox.sizeY, voxModel.vox.sizeZ), Color.green);
 		else 
-			AU.AUEditorUtility.ColoredLabel ("Vox Controls", Color.green);
+			AU.AUEditorUtility.ColoredLabel ("Controls", Color.green);
 
 		AU.AUEditorUtility.ColoredHelpBox (Color.yellow, "Enabling this may create lots of GameObjects, careful when the vox model is big");
 		voxModel.importAsIndividualVoxels = EditorGUILayout.Toggle ("Import as Individual Voxels", voxModel.importAsIndividualVoxels);

@@ -4,10 +4,11 @@ using System.Collections;
 public class MVVoxModel : MonoBehaviour {
 
 #if UNITY_EDITOR
+	[HideInInspector]
 	// not neccessary in runtime
 	public string filePath = "";
 
-	[Range(0.01f, 2.0f)]
+	[Range(0.01f, 5.0f)]
 	public float sizePerVox = 1.0f;
 
 	// for animations, voxels can later be combined into individual layers
@@ -22,6 +23,8 @@ public class MVVoxModel : MonoBehaviour {
 	[HideInInspector]
 	public MVMainChunk vox;
 
+
 #endif
+
 
 }
