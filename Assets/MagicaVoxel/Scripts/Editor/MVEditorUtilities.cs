@@ -15,18 +15,22 @@ public static class MVEditorUtilities {
 		return AssetDatabase.LoadAssetAtPath("Assets/MagicaVoxel/Meshes/quad.asset", typeof(Mesh)) as Mesh;
 	}
 
-	public static GameObject CreateGameObject(Transform parent, Vector3 pos, string name, Mesh mesh, Material mat) {
-		GameObject go = new GameObject ();
-		go.name = name;
-		go.transform.SetParent (parent);
-		go.transform.localPosition = pos;
+	[MenuItem("MagicaVoxel/Load")]
+	static void Load() {
+		string path = EditorUtility.OpenFilePanel(
+			"Open VOX model",
+			"Assets/MagicaVoxel/Vox",
+			"vox"
+		);
 
-		MeshFilter mf = go.AddComponent<MeshFilter> ();
-		mf.mesh = mesh;
+		if (path != null && path.Length > 0) {
 
-		MeshRenderer mr = go.AddComponent<MeshRenderer> ();
-		mr.material = mat;
+			GameObject go = new GameObject ();
+			go.name = System.IO.Path.GetFileNameWithoutExtension (path);
 
-		return go;
+			MVVoxModel voxModel = go.AddComponent<MVVoxModel> ();
+			voxModel.ed_filePath = path;
+			voxModel.LoadVOXFile (path, voxModel.ed_importAsIndividualVoxels);
+		}
 	}
 }
