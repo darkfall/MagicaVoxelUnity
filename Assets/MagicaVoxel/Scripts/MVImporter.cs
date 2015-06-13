@@ -430,8 +430,8 @@ public static class MVImporter
 		int childrenSize = br.ReadInt32 ();
 
 		mainChunk.sizeX = br.ReadInt32 ();
-		mainChunk.sizeY = br.ReadInt32 ();
 		mainChunk.sizeZ = br.ReadInt32 ();
+		mainChunk.sizeY = br.ReadInt32 ();
 
 		mainChunk.voxelChunk = new MVVoxelChunk ();
 		mainChunk.voxelChunk.voxels = new byte[mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ];
@@ -450,7 +450,6 @@ public static class MVImporter
 	{
 		int chunkSize = br.ReadInt32 ();
 		int childrenSize = br.ReadInt32 ();
-
 		int numVoxels = br.ReadInt32 ();
 
 		for (int i = 0; i < numVoxels; ++i) {
