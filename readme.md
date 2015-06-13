@@ -39,6 +39,12 @@ Unity3D plugin for MagicaVoxel's "vox" format
 			CreateVoxelGameObjects(mainChunk, parentTransform, material, sizePerVox)
 			CreateIndividualVoxelGameObjects(mainChunk, parentTransform, material, sizePerVox)
 		
+
+#### Todo
+
+* T-junction problems (intersections)
+* Optional palatte texture mode (instead of using vertex color)
+* Optional disable face combining	
 	
 #### License
 
