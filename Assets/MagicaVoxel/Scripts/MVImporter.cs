@@ -491,6 +491,11 @@ public static class MVImporter
 		return CreateMeshesFromChunk (chunk.voxelChunk, chunk.palatte, sizePerVox);
 	}
 
+	public static GameObject[] CreateVoxelGameObjects(MVMainChunk chunk, Transform parent, Material mat, float sizePerVox)
+	{
+		return CreateVoxelGameObjectsForChunk (chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox);
+	}
+
 	public static Mesh CubeMeshWithColor(float size, Color c) {
 		float halfSize = size / 2;
 
@@ -537,6 +542,55 @@ public static class MVImporter
 		mesh.triangles = indicies;
 		mesh.RecalculateNormals ();	
 		return mesh;
+	}
+
+
+	public static GameObject CreateGameObject(Transform parent, Vector3 pos, string name, Mesh mesh, Material mat) {
+		GameObject go = new GameObject ();
+		go.name = name;
+		go.transform.SetParent (parent);
+		go.transform.localPosition = pos;
+
+		MeshFilter mf = go.AddComponent<MeshFilter> ();
+		mf.mesh = mesh;
+
+		MeshRenderer mr = go.AddComponent<MeshRenderer> ();
+		mr.material = mat;
+
+		return go;
+	}
+
+	public static GameObject[] CreateVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox) {
+		List<GameObject> result = new List<GameObject> ();
+
+		float cx = sizePerVox * chunk.sizeX / 2;
+		float cy = sizePerVox * chunk.sizeY / 2;
+		float cz = sizePerVox * chunk.sizeZ / 2;
+
+		for (int x = 0; x < chunk.sizeX; ++x) {
+			for (int y = 0; y < chunk.sizeY; ++y) {
+				for (int z = 0; z < chunk.sizeZ; ++z) {
+
+					if (chunk.voxels [x, y, z] != 0) {
+						float px = x * sizePerVox - cx, py = y * sizePerVox - cy, pz = z * sizePerVox - cz;
+
+						GameObject go = CreateGameObject (
+							parent, 
+							new Vector3 (px, py, pz),
+							string.Format ("Voxel ({0}, {1}, {2})", x, y, z),
+							MVImporter.CubeMeshWithColor (sizePerVox, palatte [chunk.voxels [x, y, z] - 1]),
+							mat);
+
+						MVVoxModelVoxel v = go.AddComponent<MVVoxModelVoxel> ();
+						v.voxel = new MVVoxel () { x = (byte)x, y = (byte)y, z = (byte)z, colorIndex = chunk.voxels [x, y, z] };
+
+						result.Add (go);
+					}
+				}
+			}
+		}
+
+		return result.ToArray();
 	}
 
 	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox)

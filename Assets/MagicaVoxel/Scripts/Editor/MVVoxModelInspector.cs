@@ -88,38 +88,9 @@ public class MVVoxModelInspector : Editor {
 				}
 
 			} else {
-				MVVoxelChunk chunk = voxModel.vox.voxelChunk;
 
-				float sizePerVox = voxModel.sizePerVox;
+				MVImporter.CreateVoxelGameObjects (voxModel.vox, voxModel.gameObject.transform, mat, voxModel.sizePerVox);
 
-				float cx = sizePerVox * chunk.sizeX / 2;
-				float cy = sizePerVox * chunk.sizeY / 2;
-				float cz = sizePerVox * chunk.sizeZ / 2;
-
-				for (int x = 0; x < chunk.sizeX; ++x) {
-					for (int y = 0; y < chunk.sizeY; ++y) {
-						for (int z = 0; z < chunk.sizeZ; ++z) {
-						
-							if (chunk.voxels [x, y, z] != 0) {
-								float px = x * sizePerVox - cx, py = y * sizePerVox - cy, pz = z * sizePerVox - cz;
-
-								GameObject go = new GameObject ();
-								go.name = string.Format ("Voxel ({0}, {1}, {2})", x, y, z);
-								go.transform.SetParent (voxModel.gameObject.transform);
-								go.transform.localPosition = new Vector3 (px, py, pz);
-
-								MeshFilter mf = go.AddComponent<MeshFilter> ();
-								mf.mesh = MVImporter.CubeMeshWithColor(sizePerVox, voxModel.vox.palatte[chunk.voxels[x, y, z] - 1]);
-
-								MeshRenderer mr = go.AddComponent<MeshRenderer> ();
-								mr.material = mat;
-
-								MVVoxModelVoxel v = go.AddComponent<MVVoxModelVoxel> ();
-								v.voxel = new MVVoxel () { x = (byte)x, y = (byte)y, z = (byte)z, colorIndex = chunk.voxels [x, y, z] };
-							}
-						}
-					}
-				}
 			}
 
 		} else {

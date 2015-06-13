@@ -54,16 +54,7 @@ public class MVVoxModelVoxelInspector : Editor {
 
 			int index = 0;
 			foreach (Mesh mesh in meshes) {
-				GameObject go = new GameObject ();
-				go.name = string.Format ("{0} ({1})", filename, index);
-				go.transform.SetParent (model.gameObject.transform);
-				go.transform.localPosition = Vector3.zero;
-
-				MeshFilter mf = go.AddComponent<MeshFilter> ();
-				mf.mesh = mesh;
-
-				MeshRenderer mr = go.AddComponent<MeshRenderer> ();
-				mr.material = mat;
+				GameObject go = MVImporter.CreateGameObject (model.gameObject.transform, Vector3.zero, string.Format ("{0} ({1})", filename, index), mesh, mat);
 
 				MVVoxModelMesh voxMesh = go.AddComponent<MVVoxModelMesh> ();
 				voxMesh.voxels = voxels.Select( o => o.voxel ).ToArray();
@@ -75,7 +66,6 @@ public class MVVoxModelVoxelInspector : Editor {
 
 				index++;
 			}
-
 
 			foreach (MVVoxModelVoxel v in voxels) {
 				GameObject.DestroyImmediate (v.gameObject);
