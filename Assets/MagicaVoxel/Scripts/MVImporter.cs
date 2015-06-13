@@ -400,21 +400,21 @@ public static class MVImporter
 			for (int y = 0; y < voxelChunk.sizeY; ++y) {
 				for (int z = 0; z < voxelChunk.sizeZ; ++z) {
 					// left right
-					if(x == 0 || voxelChunk.voxels[x-1,y,z] == 0)
+					if(x == 0 || voxelChunk.voxels[x-1, y, z] == 0)
 						voxelChunk.faces [(int)MVFaceDir.XNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];	
 
 					if (x == voxelChunk.sizeX - 1 || voxelChunk.voxels [x + 1, y, z] == 0)
 						voxelChunk.faces [(int)MVFaceDir.XPos].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];
 
 					// up down
-					if(y == 0 || voxelChunk.voxels[x,y-1,z] == 0)
+					if(y == 0 || voxelChunk.voxels[x, y-1, z] == 0)
 						voxelChunk.faces [(int)MVFaceDir.YNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];	
 
 					if (y == voxelChunk.sizeY - 1 || voxelChunk.voxels [x, y+1, z] == 0)
 						voxelChunk.faces [(int)MVFaceDir.YPos].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];
 
 					// forward backward
-					if(z == 0 || voxelChunk.voxels[x,y,z-1] == 0)
+					if(z == 0 || voxelChunk.voxels[x, y, z-1] == 0)
 						voxelChunk.faces [(int)MVFaceDir.ZNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];	
 
 					if (z == voxelChunk.sizeZ - 1 || voxelChunk.voxels [x, y, z+1] == 0)
@@ -624,51 +624,142 @@ public static class MVImporter
 			for (int x = 0; x < chunk.sizeX; ++x) {
 				for (int y = 0; y < chunk.sizeY; ++y) {
 					for (int z = 0; z < chunk.sizeZ; ++z) {
-						// left
-						if (chunk.faces [f].colorIndices [x, y, z] != 0) {
+
+						int cidx = chunk.faces [f].colorIndices [x, y, z];
+
+						if (cidx != 0) {
 							float px = x * sizePerVox - cx, py = y * sizePerVox - cy, pz = z * sizePerVox - cz;
+
+							int rx = x, ry = y, rz = z;
+							switch (f) {
+							case 1:
+							case 0:
+								{
+									ry = y + 1;
+									while (ry < chunk.sizeY && chunk.faces [f].colorIndices [x, ry, z] == cidx)
+										ry++;
+									ry--;
+
+									rz = z + 1;
+									while (rz < chunk.sizeZ) {
+										bool inc = true;
+										for (int k = y; k <= ry; ++k) {
+											inc = inc & (chunk.faces [f].colorIndices [x, k, rz] == cidx);
+										}
+
+										if (inc)
+											rz++;
+										else
+											break;
+									}
+									rz--;
+									break;
+								}
+
+							case 3:
+							case 2:
+								{
+									rx = x + 1;
+									while (rx < chunk.sizeX && chunk.faces [f].colorIndices [rx, y, z] == cidx)
+										rx++;
+									rx--;
+
+									rz = z + 1;
+									while (rz < chunk.sizeZ) {
+										bool inc = true;
+										for (int k = x; k <= rx; ++k) {
+											inc = inc & (chunk.faces [f].colorIndices [k, y, rz] == cidx);
+										}
+
+										if (inc)
+											rz++;
+										else
+											break;
+									}
+									rz--;
+									break;
+								}
+
+							case 5:
+							case 4:
+								{
+									rx = x + 1;
+									while (rx < chunk.sizeX && chunk.faces [f].colorIndices [rx, y, z] == cidx)
+										rx++;
+									rx--;
+
+									ry = y + 1;
+									while (ry < chunk.sizeY) {
+										bool inc = true;
+										for (int k = x; k <= rx; ++k) {
+											inc = inc & (chunk.faces [f].colorIndices [k, ry, z] == cidx);
+										}
+
+										if (inc)
+											ry++;
+										else
+											break;
+									}
+									ry--;
+									break;
+								}
+							}
+
+
+							for (int kx = x; kx <= rx; ++kx) {
+								for (int ky = y; ky <= ry; ++ky) {
+									for (int kz = z; kz <= rz; ++kz) {
+										if(kx != x || ky != y || kz != z)
+											chunk.faces [f].colorIndices [kx, ky, kz] = 0;
+									}
+								}
+							}
+
+							int dx = rx - x;
+							int dy = ry - y;
+							int dz = rz - z;
 
 							switch (f) {
 							case 1:
 								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize + sizePerVox * dz));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize + sizePerVox * dy, pz + halfSize + sizePerVox * dz));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize + sizePerVox * dy, pz - halfSize));
 								break;
 
 							case 0:
 								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize + sizePerVox * dy, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize, py + halfSize + sizePerVox * dy, pz + halfSize + sizePerVox * dz));
+								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize + sizePerVox * dz));
 								break;
 
 							case 3:
-								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py - halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py - halfSize, pz + halfSize + sizePerVox * dz));
+								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize + sizePerVox * dz));
 								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz - halfSize));
 								break;
 
 							case 2:
-								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py + halfSize, pz - halfSize));
 								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize + sizePerVox * dz));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py + halfSize, pz + halfSize + sizePerVox * dz));
 								break;
 
 							case 5:
-								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz - halfSize));
-								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz - halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize + sizePerVox * dy, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py + halfSize + sizePerVox * dy, pz - halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py - halfSize, pz - halfSize));
 								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz - halfSize));
 								break;
 
 							case 4:
-								verts.Add (new Vector3 (px - halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px - halfSize, py + halfSize + sizePerVox * dy, pz + halfSize));
 								verts.Add (new Vector3 (px - halfSize, py - halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px + halfSize, py - halfSize, pz + halfSize));
-								verts.Add (new Vector3 (px + halfSize, py + halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py - halfSize, pz + halfSize));
+								verts.Add (new Vector3 (px + halfSize + sizePerVox * dx, py + halfSize + sizePerVox * dy, pz + halfSize));
 								break;
 							}
 
@@ -678,7 +769,7 @@ public static class MVImporter
 							normals.Add (faceNormals [f]);
 
 							// color index starts with 1
-							Color c = palatte [chunk.faces [f].colorIndices [x, y, z] - 1];
+							Color c = palatte [cidx - 1];
 
 							colors.Add (c);
 							colors.Add (c);

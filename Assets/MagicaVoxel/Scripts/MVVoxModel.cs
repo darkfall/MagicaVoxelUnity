@@ -11,7 +11,7 @@ public class MVVoxModel : MonoBehaviour {
 	public float sizePerVox = 1.0f;
 
 	// for animations, voxels can later be combined into individual layers
-	[Header("This may create lots of GameObjects, careful when the vox model is big")]
+	[HideInInspector]
 	public bool importAsIndividualVoxels = false;
 
 	// automatically add a box collider ?
