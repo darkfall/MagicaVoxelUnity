@@ -618,6 +618,7 @@ public static class MVImporter
 		float cy = sizePerVox * chunk.sizeY / 2;
 		float cz = sizePerVox * chunk.sizeZ / 2;
 
+		int currentQuadCount = 0;
 		int totalQuadCount = 0;
 		for (int f = 0; f < 6; ++f) {
 			for (int x = 0; x < chunk.sizeX; ++x) {
@@ -775,14 +776,14 @@ public static class MVImporter
 							colors.Add (c);
 							colors.Add (c);
 
-							indicies.Add (totalQuadCount * 4 + 0);
-							indicies.Add (totalQuadCount * 4 + 1);
-							indicies.Add (totalQuadCount * 4 + 2);
-							indicies.Add (totalQuadCount * 4 + 2);
-							indicies.Add (totalQuadCount * 4 + 3);
-							indicies.Add (totalQuadCount * 4 + 0);
+							indicies.Add (currentQuadCount * 4 + 0);
+							indicies.Add (currentQuadCount * 4 + 1);
+							indicies.Add (currentQuadCount * 4 + 2);
+							indicies.Add (currentQuadCount * 4 + 2);
+							indicies.Add (currentQuadCount * 4 + 3);
+							indicies.Add (currentQuadCount * 4 + 0);
 
-							totalQuadCount += 1;
+							currentQuadCount += 1;
 
 							// u3d max
 							if (verts.Count + 4 >= 65000) {
@@ -798,7 +799,9 @@ public static class MVImporter
 								colors.Clear ();
 								normals.Clear ();
 								indicies.Clear ();
-								totalQuadCount = 0;
+
+								totalQuadCount += currentQuadCount;
+								currentQuadCount = 0;
 							}
 						}
 					}
@@ -814,6 +817,8 @@ public static class MVImporter
 			mesh.triangles = indicies.ToArray ();
 			mesh.Optimize ();
 			result.Add (mesh);
+
+			totalQuadCount += currentQuadCount;
 		}
 
 		Debug.Log (string.Format ("[MVImport] Mesh generated, total quads {0}", totalQuadCount));
