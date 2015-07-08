@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
@@ -507,9 +507,19 @@ public static class MVImporter
 		return CreateVoxelGameObjectsForChunk (chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox);
 	}
 
+	public static GameObject[] CreateVoxelGameObjects(MVMainChunk chunk, Transform parent, Material mat, float sizePerVox, Vector3 origin)
+	{
+		return CreateVoxelGameObjectsForChunk(chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox, origin);
+	}
+
 	public static GameObject[] CreateIndividualVoxelGameObjects(MVMainChunk chunk, Transform parent, Material mat, float sizePerVox)
 	{
 		return CreateIndividualVoxelGameObjectsForChunk (chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox);
+	}
+
+	public static GameObject[] CreateIndividualVoxelGameObjects(MVMainChunk chunk, Transform parent, Material mat, float sizePerVox, Vector3 origin)
+	{
+		return CreateIndividualVoxelGameObjectsForChunk(chunk.voxelChunk, chunk.palatte, parent, mat, sizePerVox, origin);
 	}
 
 	public static Mesh CubeMeshWithColor(float size, Color c) {
@@ -576,19 +586,25 @@ public static class MVImporter
 		return go;
 	}
 
-	public static GameObject[] CreateIndividualVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox) {
-		List<GameObject> result = new List<GameObject> ();
+	public static GameObject[] CreateIndividualVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox)
+	{
+		Vector3 origin = new Vector3(
+			sizePerVox * chunk.sizeX / 2,
+			sizePerVox * chunk.sizeY / 2,
+			sizePerVox * chunk.sizeZ / 2);
 
-		float cx = sizePerVox * chunk.sizeX / 2;
-		float cy = sizePerVox * chunk.sizeY / 2;
-		float cz = sizePerVox * chunk.sizeZ / 2;
+		return CreateIndividualVoxelGameObjectsForChunk(chunk, palatte, parent, mat, sizePerVox, origin);
+	}
+
+	public static GameObject[] CreateIndividualVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox, Vector3 origin) {
+		List<GameObject> result = new List<GameObject> ();
 
 		for (int x = 0; x < chunk.sizeX; ++x) {
 			for (int y = 0; y < chunk.sizeY; ++y) {
 				for (int z = 0; z < chunk.sizeZ; ++z) {
 
 					if (chunk.voxels [x, y, z] != 0) {
-						float px = x * sizePerVox - cx, py = y * sizePerVox - cy, pz = z * sizePerVox - cz;
+						float px = (x - origin.x + 0.5f) * sizePerVox, py = (y - origin.y + 0.5f) * sizePerVox, pz = (z - origin.z + 0.5f) * sizePerVox;
 
 						GameObject go = CreateGameObject (
 							parent, 
@@ -609,11 +625,20 @@ public static class MVImporter
 		return result.ToArray();
 	}
 
+	public static GameObject[] CreateVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox)
+	{
+		Vector3 origin = new Vector3(
+			sizePerVox * chunk.sizeX / 2,
+			sizePerVox * chunk.sizeY / 2,
+			sizePerVox * chunk.sizeZ / 2);
 
-	public static GameObject[] CreateVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox) {
+		return CreateVoxelGameObjectsForChunk(chunk, palatte, parent, mat, sizePerVox, origin);
+	}
+
+	public static GameObject[] CreateVoxelGameObjectsForChunk(MVVoxelChunk chunk, Color[] palatte, Transform parent, Material mat, float sizePerVox, Vector3 origin) {
 		List<GameObject> result = new List<GameObject> ();
 
-		Mesh[] meshes = CreateMeshesFromChunk (chunk, palatte, sizePerVox);
+		Mesh[] meshes = CreateMeshesFromChunk (chunk, palatte, sizePerVox, origin);
 
 		int index = 0;
 		foreach (Mesh mesh in meshes) {
@@ -638,6 +663,16 @@ public static class MVImporter
 
 	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox)
 	{
+		Vector3 origin = new Vector3(
+			sizePerVox * chunk.sizeX / 2,
+			sizePerVox * chunk.sizeY / 2,
+			sizePerVox * chunk.sizeZ / 2);
+
+		return CreateMeshesFromChunk(chunk, palatte, sizePerVox, origin);
+	}
+
+	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox, Vector3 origin)
+	{
 		List<Vector3> verts = new List<Vector3> ();
 		List<Vector3> normals = new List<Vector3> ();
 		List<Color> colors = new List<Color> ();
@@ -658,9 +693,6 @@ public static class MVImporter
 			sizePerVox = 0.1f;
 		
 		float halfSize = sizePerVox / 2.0f;
-		float cx = sizePerVox * chunk.sizeX / 2;
-		float cy = sizePerVox * chunk.sizeY / 2;
-		float cz = sizePerVox * chunk.sizeZ / 2;
 
 		int currentQuadCount = 0;
 		int totalQuadCount = 0;
@@ -672,7 +704,7 @@ public static class MVImporter
 						int cidx = chunk.faces [f].colorIndices [x, y, z];
 
 						if (cidx != 0) {
-							float px = x * sizePerVox - cx, py = y * sizePerVox - cy, pz = z * sizePerVox - cz;
+							float px = (x - origin.x + 0.5f) * sizePerVox, py = (y - origin.y + 0.5f) * sizePerVox, pz = (z - origin.z + 0.5f) * sizePerVox;
 
 							int rx = x, ry = y, rz = z;
 							switch (f) {

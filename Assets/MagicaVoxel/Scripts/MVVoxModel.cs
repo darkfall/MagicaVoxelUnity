@@ -22,6 +22,7 @@ public class MVVoxModel : MonoBehaviour {
 
 	public Material voxMaterial = null;
 
+	public Transform meshOrigin = null;
 
 	public void ClearVoxMeshes() {
 		MVVoxModelMesh[] subMeshes = this.gameObject.GetComponentsInChildren<MVVoxModelMesh> ();
@@ -42,13 +43,20 @@ public class MVVoxModel : MonoBehaviour {
 
 			if (v != null) {
 				Material mat = (this.voxMaterial != null) ? this.voxMaterial : MVImporter.DefaultMaterial;
+
 				if (!asIndividualVoxels) {
 
-					MVImporter.CreateVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
+					if (meshOrigin != null)
+						MVImporter.CreateVoxelGameObjects(v, this.gameObject.transform, mat, sizePerVox, meshOrigin.localPosition);
+					else
+						MVImporter.CreateVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
 
 				} else {
 
-					MVImporter.CreateIndividualVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
+					if (meshOrigin != null)
+						MVImporter.CreateIndividualVoxelGameObjects(v, this.gameObject.transform, mat, sizePerVox, meshOrigin.localPosition);
+					else
+						MVImporter.CreateIndividualVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
 
 				}
 
