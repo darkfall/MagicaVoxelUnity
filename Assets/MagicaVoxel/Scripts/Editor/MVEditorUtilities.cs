@@ -23,14 +23,25 @@ public static class MVEditorUtilities {
 			"vox"
 		);
 
-		if (path != null && path.Length > 0) {
+		if (path != null && path.Length > 0)
+		{
+			string alphaMaskPath = string.Empty;
+			if (EditorUtility.DisplayDialog("Question", "Do you want to load an alpha mask model?", "yes", "no"))
+			{
+				alphaMaskPath = EditorUtility.OpenFilePanel(
+					"Open VOX model for alpha mask",
+					"Assets/MagicaVoxel/Vox",
+					"vox"
+				);
+			}
 
 			GameObject go = new GameObject ();
 			go.name = System.IO.Path.GetFileNameWithoutExtension (path);
 
 			MVVoxModel voxModel = go.AddComponent<MVVoxModel> ();
 			voxModel.ed_filePath = path;
-			voxModel.LoadVOXFile (path, voxModel.ed_importAsIndividualVoxels);
+			voxModel.ed_alphaMaskFilePath = alphaMaskPath;
+			voxModel.LoadVOXFile (path, alphaMaskPath, voxModel.ed_importAsIndividualVoxels);
 		}
 	}
 }
