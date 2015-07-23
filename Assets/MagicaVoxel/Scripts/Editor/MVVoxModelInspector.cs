@@ -28,13 +28,26 @@ public class MVVoxModelInspector : Editor {
 				"vox"
 			);
 
-			voxModel.ed_filePath = path;
-			voxModel.LoadVOXFile (path, voxModel.ed_importAsIndividualVoxels);
+			if (!string.IsNullOrEmpty(path))
+			{
+				string alphaMaskPath = string.Empty;
+				if (EditorUtility.DisplayDialog("Question", "Do you want to load an alpha mask model file?", "yes", "no"))
+				{
+					alphaMaskPath = EditorUtility.OpenFilePanel(
+					"Open VOX model for alpha mask",
+					"Assets/MagicaVoxel/Vox",
+					"vox"
+				);
+				}
 
+				voxModel.ed_filePath = path;
+				voxModel.ed_alphaMaskFilePath = alphaMaskPath;
+				voxModel.LoadVOXFile(path, alphaMaskPath, voxModel.ed_importAsIndividualVoxels);
+			}
 		}
 		if (GUILayout.Button ("Reimport")) {
 
-			voxModel.LoadVOXFile (voxModel.ed_filePath, voxModel.ed_importAsIndividualVoxels);
+			voxModel.LoadVOXFile (voxModel.ed_filePath, voxModel.ed_alphaMaskFilePath, voxModel.ed_importAsIndividualVoxels);
 		}
 
 		if (GUILayout.Button ("Clear")) {
