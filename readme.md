@@ -51,5 +51,5 @@ Unity3D plugin for MagicaVoxel's "vox" format
 MIT
 
 #### Contact
-* darkfall3 at gmail.com
-* [http://darkfall.me](http://darkfall.me) 
+* darkfall3 at gmail.com ([http://darkfall.me](http://darkfall.me))
+* barraudf ([https://github.com/barraudf](https://github.com/barraudf))
