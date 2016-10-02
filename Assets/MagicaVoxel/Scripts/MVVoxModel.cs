@@ -3,11 +3,6 @@ using System.Collections;
 
 public class MVVoxModel : MonoBehaviour {
 
-#if UNITY_EDITOR
-	[HideInInspector]
-	// not neccessary in runtime
-	public string ed_filePath = "";
-
 	[HideInInspector]
 	// not neccessary in runtime
 	public string ed_alphaMaskFilePath = "";
@@ -16,7 +11,8 @@ public class MVVoxModel : MonoBehaviour {
 	[HideInInspector]
 	public bool ed_importAsIndividualVoxels = false;
 
-#endif
+	// actually requred for instantiation
+	public string ed_filePath = "";
 
 	[HideInInspector]
 	public MVMainChunk vox;
@@ -109,5 +105,13 @@ public class MVVoxModel : MonoBehaviour {
 			this.vox = v;
 		}
 
+	}
+
+	public bool reimportOnStart = true;
+	void Start()
+	{
+		if (reimportOnStart) {
+			LoadVOXFile (ed_filePath, ed_alphaMaskFilePath, ed_importAsIndividualVoxels);
+		}
 	}
 }
