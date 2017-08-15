@@ -350,7 +350,20 @@ public static class MVImporter
 				int readSize = 0;
 				while (readSize < childrenSize) {
 					chunkId = br.ReadBytes (4);
-					if (chunkId [0] == 'S' &&
+
+					if (chunkId [0] == 'P' &&
+						chunkId [1] == 'A' &&
+						chunkId [2] == 'C' &&
+						chunkId [3] == 'K') {
+
+						int chunkContentBytes = br.ReadInt32 ();
+						int childrenBytes = br.ReadInt32 ();
+
+						int modelCount = br.ReadInt32 ();
+
+						readSize += chunkContentBytes + childrenBytes + 4 * 3;
+					}
+					else if (chunkId [0] == 'S' &&
 						chunkId [1] == 'I' &&
 						chunkId [2] == 'Z' &&
 						chunkId [3] == 'E') {
@@ -898,7 +911,7 @@ public static class MVImporter
 								mesh.colors = colors.ToArray();
 								mesh.normals = normals.ToArray();
 								mesh.triangles = indicies.ToArray ();
-								mesh.Optimize ();
+
 								result.Add (mesh);
 
 								verts.Clear ();
@@ -921,7 +934,7 @@ public static class MVImporter
 			mesh.colors = colors.ToArray();
 			mesh.normals = normals.ToArray();
 			mesh.triangles = indicies.ToArray ();
-			mesh.Optimize ();
+
 			result.Add (mesh);
 
 			totalQuadCount += currentQuadCount;
