@@ -429,11 +429,13 @@ public static class MVImporter
 		for (int x = 0; x < voxelChunk.sizeX; ++x) {
 			for (int y = 0; y < voxelChunk.sizeY; ++y) {
 				for (int z = 0; z < voxelChunk.sizeZ; ++z) {
-					
-					int alpha = alphaMask == null ? (byte)0 : alphaMask.voxels[x, y, z];
 
-					// left right
-					if (x == 0 || DetermineEmptyOrOtherAlphaVoxel(voxelChunk, alphaMask, alpha, x - 1, y, z))
+                    int alpha = 0;
+                    if (alphaMask != null && alphaMask.voxels != null)
+                        alpha = alphaMask.voxels[x, y, z];
+
+                    // left right
+                    if (x == 0 || DetermineEmptyOrOtherAlphaVoxel(voxelChunk, alphaMask, alpha, x - 1, y, z))
 						voxelChunk.faces [(int)MVFaceDir.XNeg].colorIndices [x, y, z] = voxelChunk.voxels [x, y, z];
 
 					if (x == voxelChunk.sizeX - 1 || DetermineEmptyOrOtherAlphaVoxel(voxelChunk, alphaMask, alpha, x + 1, y, z))
@@ -469,7 +471,7 @@ public static class MVImporter
 		mainChunk.voxelChunk = new MVVoxelChunk ();
 		mainChunk.voxelChunk.voxels = new byte[mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ];
 
-		Debug.Log (string.Format ("[MVImporter] Voxel Size {0}x{1}x{2}", mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ));
+        Debug.Log (string.Format ("[MVImporter] Voxel Size {0}x{1}x{2}", mainChunk.sizeX, mainChunk.sizeY, mainChunk.sizeZ));
 
 		if (childrenSize > 0) {
 			br.ReadBytes (childrenSize);
@@ -634,7 +636,7 @@ public static class MVImporter
 						float px = (x - origin.x + 0.5f) * sizePerVox, py = (y - origin.y + 0.5f) * sizePerVox, pz = (z - origin.z + 0.5f) * sizePerVox;
 						Color c = palatte [chunk.voxels [x, y, z] - 1];
 
-						if (alphaMask != null && alphaMask.voxels[x, y, z] != 0)
+						if (alphaMask != null && alphaMask.voxels != null && alphaMask.voxels[x, y, z] != 0)
 							c.a = (float)(alphaMask.voxels [x, y, z] - 1) / 255;
 
 						GameObject go = CreateGameObject (
@@ -706,7 +708,7 @@ public static class MVImporter
 
 	public static Mesh[] CreateMeshesFromChunk(MVVoxelChunk chunk, Color[] palatte, float sizePerVox, MVVoxelChunk alphaMask, Vector3 origin)
 	{
-		if (alphaMask != null && (alphaMask.sizeX != chunk.sizeX || alphaMask.sizeY != chunk.sizeY || alphaMask.sizeZ != chunk.sizeZ))
+		if (alphaMask != null && alphaMask.voxels != null && (alphaMask.sizeX != chunk.sizeX || alphaMask.sizeY != chunk.sizeY || alphaMask.sizeZ != chunk.sizeZ))
 		{
 			Debug.LogErrorFormat("Unable to create meshes from chunk : Chunk's size ({0},{1},{2}) differs from alphaMask chunk's size ({3},{4},{5})", chunk.sizeX, chunk.sizeY, chunk.sizeZ, alphaMask.sizeX, alphaMask.sizeY, alphaMask.sizeZ);
 			return new Mesh[] { };
@@ -741,9 +743,12 @@ public static class MVImporter
 					for (int z = 0; z < chunk.sizeZ; ++z) {
 
 						int cidx = chunk.faces [f].colorIndices [x, y, z];
-						int alpha = alphaMask == null ? (byte)0 : alphaMask.voxels[x, y, z];
+                        int alpha = 0;
+                        if(alphaMask == null && alphaMask.voxels != null)
+                            alpha = alphaMask.voxels[x, y, z];
 
-						if (cidx != 0) {
+
+                        if (cidx != 0) {
 							float px = (x - origin.x + 0.5f) * sizePerVox, py = (y - origin.y + 0.5f) * sizePerVox, pz = (z - origin.z + 0.5f) * sizePerVox;
 
 							int rx = x, ry = y, rz = z;
@@ -947,7 +952,7 @@ public static class MVImporter
 
 	private static bool CompareColor(int cidx, int alpha, MVVoxelChunk chunk, MVVoxelChunk alphaChunk, int f, int x, int y, int z)
 	{
-		if (alphaChunk == null)
+		if (alphaChunk == null || alphaChunk.voxels == null)
 			return chunk.faces[f].colorIndices[x, y, z] == cidx;
 		else
 			return chunk.faces[f].colorIndices[x, y, z] == cidx && alphaChunk.voxels[x, y, z] == alpha;
@@ -957,7 +962,7 @@ public static class MVImporter
 	{
 		bool isEmpty = voxelChunk.voxels[x, y, z] == 0;
 
-		if (alphaMask == null)
+		if (alphaMask == null || alphaMask.voxels == null)
 			return isEmpty;
 		else
 		{
