@@ -1,3 +1,9 @@
+### Note
+
+This project is somewhat old and doesn't support parsing the new features added in the newer .vox format. Though it should still be able to load it.
+Due to constraints from my current employer, sadly I cannot directly work on this for now. I'll be glad to merge PRs : )
+
+
 ### MagicaVoxelUnity
 
 Unity3D plugin for MagicaVoxel's "vox" format
@@ -52,4 +58,10 @@ MIT
 
 #### Contact
 * darkfall3 at gmail.com ([http://darkfall.me](http://darkfall.me))
+
+#### Thanks
 * barraudf ([https://github.com/barraudf](https://github.com/barraudf))
+* Stefano Cecere ([https://github.com/StefanoCecere](https://github.com/StefanoCecere))
+* jonaskivi ([https://github.com/jonaskivi](https://github.com/jonaskivi))
+
+And all other contributors 
