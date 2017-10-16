@@ -15,7 +15,7 @@ public static class MVEditorUtilities {
 		return AssetDatabase.LoadAssetAtPath("Assets/MagicaVoxel/Meshes/quad.asset", typeof(Mesh)) as Mesh;
 	}
 
-	[MenuItem("MagicaVoxel/Load")]
+	[MenuItem("Tools/MagicaVoxel/Load")]
 	static void Load() {
 		string path = EditorUtility.OpenFilePanel(
 			"Open VOX model",
