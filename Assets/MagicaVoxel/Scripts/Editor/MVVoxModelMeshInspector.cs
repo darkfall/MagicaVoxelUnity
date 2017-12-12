@@ -33,11 +33,12 @@ public class MVVoxModelMeshInspector : Editor {
 		List<GameObject> objects = new List<GameObject> ();
 		foreach (MVVoxel voxel in voxels) {
 			float px = voxel.x * sizePerVox - cx, py = voxel.y * sizePerVox - cy, pz = voxel.z * sizePerVox - cz;
+            int cidx = chunk.voxels[voxel.x, voxel.y, voxel.z];
 
-			GameObject go = MVImporter.CreateGameObject (voxModel.gameObject.gameObject.transform,
+            GameObject go = MVImporter.CreateGameObject (voxModel.gameObject.gameObject.transform,
 				               		 					 new Vector3 (px, py, pz),
 														 string.Format ("Voxel ({0}, {1}, {2})", voxel.x, voxel.y, voxel.z),
-				                						 MVImporter.CubeMeshWithColor (sizePerVox, voxModel.vox.palatte [chunk.voxels [voxel.x, voxel.y, voxel.z] - 1]),
+				                						 MVImporter.CubeMeshWithColor (sizePerVox, voxModel.vox.palatte [cidx - 1], cidx),
 				                						 mat);
 
 			MVVoxModelVoxel v = go.AddComponent<MVVoxModelVoxel> ();
