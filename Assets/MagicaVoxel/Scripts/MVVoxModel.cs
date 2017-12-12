@@ -2,11 +2,7 @@
 using System.Collections;
 
 public class MVVoxModel : MonoBehaviour {
-
-	[HideInInspector]
-	// not neccessary in runtime
-	public string ed_alphaMaskFilePath = "";
-
+    
 	// for animations, voxels can later be combined into individual layers
 	[HideInInspector]
 	public bool ed_importAsIndividualVoxels = false;
@@ -24,6 +20,9 @@ public class MVVoxModel : MonoBehaviour {
 
 	public Transform meshOrigin = null;
 
+    [Tooltip("If the vox file contains a palette, should it be converted to a texture?")]
+    public bool paletteToTex = false;
+
 	public void ClearVoxMeshes() {
 		MVVoxModelMesh[] subMeshes = this.gameObject.GetComponentsInChildren<MVVoxModelMesh> ();
 		foreach (MVVoxModelMesh subMesh in subMeshes)
@@ -35,23 +34,17 @@ public class MVVoxModel : MonoBehaviour {
 
 	}
 
-	public void LoadVOXFile(string path, string alphaMaskPath, bool asIndividualVoxels) {
+	public void LoadVOXFile(string path, bool asIndividualVoxels) {
 		ClearVoxMeshes ();
 
 		if (path != null && path.Length > 0)
 		{
-			MVVoxelChunk alphaChunk = null;
-			if (!string.IsNullOrEmpty(alphaMaskPath))
-			{
-				MVMainChunk mc = MVImporter.LoadVOX(alphaMaskPath, generateFaces: false);
-				if(mc != null)
-					alphaChunk = mc.voxelChunk;
-			}
-
-			MVMainChunk v = MVImporter.LoadVOX (path, alphaChunk);
+			MVMainChunk v = MVImporter.LoadVOX (path);
 
 			if (v != null) {
 				Material mat = (this.voxMaterial != null) ? this.voxMaterial : MVImporter.DefaultMaterial;
+                if (paletteToTex)
+                    mat.mainTexture = v.PaletteToTexture();
 
 				if (!asIndividualVoxels) {
 
@@ -78,20 +71,17 @@ public class MVVoxModel : MonoBehaviour {
 		}
 	}
 
-	public void LoadVOXData(byte[] data, bool asIndividualVoxels, byte[] alphaMaskData = null) {
+	public void LoadVOXData(byte[] data, bool asIndividualVoxels) {
 		ClearVoxMeshes ();
 
-		MVVoxelChunk alphaMask = null;
-		if(alphaMaskData != null)
-		{
-			MVMainChunk mc = MVImporter.LoadVOXFromData(alphaMaskData, generateFaces: false);
-			if (mc != null)
-				alphaMask = mc.voxelChunk;
-		}
-		MVMainChunk v = MVImporter.LoadVOXFromData(data, alphaMask);
+		MVMainChunk v = MVImporter.LoadVOXFromData(data);
 
 		if (v != null) {
 			Material mat = (this.voxMaterial != null) ? this.voxMaterial : MVImporter.DefaultMaterial;
+
+            if (paletteToTex)
+                mat.mainTexture = v.PaletteToTexture();
+
 			if (!asIndividualVoxels) {
 
 				MVImporter.CreateVoxelGameObjects (v, this.gameObject.transform, mat, sizePerVox);
@@ -111,7 +101,7 @@ public class MVVoxModel : MonoBehaviour {
 	void Start()
 	{
 		if (reimportOnStart) {
-			LoadVOXFile (ed_filePath, ed_alphaMaskFilePath, ed_importAsIndividualVoxels);
+			LoadVOXFile (ed_filePath, ed_importAsIndividualVoxels);
 		}
 	}
 }

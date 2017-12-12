@@ -40,8 +40,8 @@ public class MVVoxModelVoxelInspector : Editor {
 				chunk.voxels [v.voxel.x, v.voxel.y, v.voxel.z] = v.voxel.colorIndex;
 			}
 
-			MVImporter.GenerateFaces(chunk, model.vox.alphaMaskChunk);
-			Mesh[] meshes = MVImporter.CreateMeshesFromChunk(chunk, model.vox.palatte, model.sizePerVox, model.vox.alphaMaskChunk);
+			MVImporter.GenerateFaces(chunk);
+			Mesh[] meshes = MVImporter.CreateMeshesFromChunk(chunk, model.vox.palatte, model.sizePerVox);
 
 			if (meshes.Length > 1) {
 				Debug.LogError ("[MVCombine] Currently does not support combining voxels into multiple meshes, please reduce the number of voxels you are trying to combine");
