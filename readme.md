@@ -49,7 +49,6 @@ Unity3D plugin for MagicaVoxel's "vox" format
 #### Todo
 
 * T-junction problems (intersections)
-* Optional palatte texture mode (instead of using vertex color)
 * Optional disable face combining
 
 #### License
